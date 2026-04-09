@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>handl.io — CEO Brain | Apex Distribution</title>
+<style>
+  :root {
+    --gold: #C5A028;
+    --gold-light: #F5EDD3;
+    --gold-mid: #E8C84A;
+    --black: #1A1A1A;
+    --gray-dark: #444;
+    --gray: #888;
+    --gray-light: #F2F2F2;
+    --white: #FFFFFF;
+    --red: #C0392B;
+    --red-light: #FADBD8;
+    --green: #1E8449;
+    --green-light: #D5F5E3;
+    --amber: #D35400;
+    --amber-light: #FDEBD0;
+    --blue: #1A5276;
+    --blue-light: #D6EAF8;
+    --sidebar-w: 220px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Arial', sans-serif; background: #F0F0F0; color: var(--black); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w); background: var(--black); display: flex; flex-direction: column;
+    flex-shrink: 0; height: 100vh; overflow-y: auto;
+  }
+  .sidebar-logo { padding: 20px 18px 14px; border-bottom: 1px solid #333; }
+  .sidebar-logo .brand { font-size: 20px; font-weight: 700; color: var(--white); }
+  .sidebar-logo .brand span { color: var(--gold); }
+  .sidebar-logo .company { font-size: 11px; color: var(--gray); margin-top: 3px; }
+  .sidebar-logo .date { font-size: 10px; color: var(--gray); margin-top: 2px; }
+  .nav-section { padding: 14px 0 4px; }
+  .nav-label { font-size: 9px; font-weight: 700; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; padding: 0 18px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+    cursor: pointer; color: #AAA; font-size: 12px; transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: #2A2A2A; color: var(--white); }
+  .nav-item.active { background: #2A2A2A; color: var(--white); border-left-color: var(--gold); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--red); color: white; font-size: 9px;
+    font-weight: 700; padding: 1px 5px; border-radius: 8px;
+  }
+  .nav-badge.amber { background: var(--amber); }
+  .sidebar-footer { margin-top: auto; padding: 14px 18px; border-top: 1px solid #333; }
+  .sidebar-footer .user { font-size: 11px; color: var(--gray); }
+  .sidebar-footer .user strong { color: #CCC; display: block; }
+
+  /* ── Main ── */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    background: var(--white); padding: 12px 24px; display: flex; align-items: center;
+    gap: 12px; border-bottom: 1px solid #DDD; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--black); }
+  .topbar-subtitle { font-size: 11px; color: var(--gray); margin-left: 4px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .badge-live { background: var(--green); color: white; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.5px; }
+  .refresh-btn {
+    background: var(--gold); color: var(--black); border: none; padding: 5px 12px;
+    border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+
+  /* ── Content area ── */
+  #content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+  /* ── Tabs (for sub-navigation within a section) ── */
+  .tab-bar { display: flex; gap: 0; margin-bottom: 18px; border-bottom: 2px solid #DDD; }
+  .tab {
+    padding: 8px 18px; font-size: 12px; font-weight: 600; color: var(--gray);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s;
+  }
+  .tab:hover { color: var(--black); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── Cards ── */
+  .grid { display: grid; gap: 14px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2-1 { grid-template-columns: 2fr 1fr; }
+  .grid-1-2 { grid-template-columns: 1fr 2fr; }
+
+  .card { background: var(--white); border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .card-title { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .card-title.gold { color: var(--gold); }
+
+  /* KPI cards */
+  .kpi-val { font-size: 28px; font-weight: 700; color: var(--black); line-height: 1; }
+  .kpi-label { font-size: 10px; color: var(--gray); margin-top: 3px; }
+  .kpi-delta { font-size: 11px; font-weight: 700; margin-top: 5px; }
+  .kpi-delta.up { color: var(--green); }
+  .kpi-delta.down { color: var(--red); }
+  .kpi-delta.warn { color: var(--amber); }
+
+  /* Alert items */
+  .alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F0F0F0; }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .alert-dot.red { background: var(--red); }
+  .alert-dot.amber { background: var(--amber); }
+  .alert-dot.green { background: var(--green); }
+  .alert-dot.blue { background: var(--blue); }
+  .alert-text { font-size: 12px; color: var(--black); line-height: 1.4; }
+  .alert-time { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+  /* List rows */
+  .list-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #F0F0F0; gap: 10px; }
+  .list-row:last-child { border-bottom: none; }
+  .list-label { font-size: 12px; color: var(--black); flex: 1; }
+  .list-val { font-size: 12px; font-weight: 700; color: var(--black); }
+  .list-sub { font-size: 10px; color: var(--gray); }
+
+  /* Progress bars */
+  .progress-wrap { margin-top: 5px; background: #EEE; border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 4px; }
+  .bar-green { background: var(--green); }
+  .bar-amber { background: var(--amber); }
+  .bar-red { background: var(--red); }
+  .bar-gold { background: var(--gold); }
+  .bar-blue { background: var(--blue); }
+
+  /* Status pills */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+  .pill-red { background: var(--red-light); color: var(--red); }
+  .pill-green { background: var(--green-light); color: var(--green); }
+  .pill-amber { background: var(--amber-light); color: var(--amber); }
+  .pill-blue { background: var(--blue-light); color: var(--blue); }
+  .pill-gold { background: var(--gold-light); color: #7A6010; }
+
+  /* Briefing text */
+  .briefing-item { padding: 10px 0; border-bottom: 1px solid #F0F0F0; }
+  .briefing-item:last-child { border-bottom: none; }
+  .briefing-item h4 { font-size: 11px; font-weight: 700; color: var(--black); margin-bottom: 3px; }
+  .briefing-item p { font-size: 11px; color: var(--gray-dark); line-height: 1.5; }
+
+  /* Insight box */
+  .insight-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 12px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; }
+  .insight-box p { font-size: 11px; color: #5A4010; line-height: 1.5; }
+  .insight-box strong { color: #3A2A08; }
+
+  /* Section divider */
+  .section-header { margin: 18px 0 12px; }
+  .section-header h3 { font-size: 13px; font-weight: 700; color: var(--black); }
+  .section-header p { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  /* Sparkline (CSS-only bars) */
+  .spark { display: flex; align-items: flex-end; gap: 2px; height: 30px; margin-top: 8px; }
+  .spark-bar { flex: 1; border-radius: 2px 2px 0 0; }
+
+  /* Rep table */
+  .rep-table { width: 100%; border-collapse: collapse; }
+  .rep-table th { font-size: 9px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 6px; text-align: left; border-bottom: 2px solid #EEE; }
+  .rep-table td { font-size: 11px; padding: 7px 6px; border-bottom: 1px solid #F5F5F5; color: var(--black); vertical-align: middle; }
+  .rep-table tr:last-child td { border-bottom: none; }
+
+  /* SVG mini charts */
+  svg.minichart { display: block; }
+
+  /* Sentiment gauge */
+  .gauge-wrap { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .gauge-label { font-size: 11px; color: var(--gray); width: 110px; }
+  .gauge-bar-wrap { flex: 1; background: #EEE; border-radius: 4px; height: 8px; }
+  .gauge-val { font-size: 11px; font-weight: 700; width: 34px; text-align: right; }
+
+  .hidden { display: none !important; }
+
+  /* Scrollbar */
+  #content::-webkit-scrollbar { width: 6px; }
+  #content::-webkit-scrollbar-track { background: #EEE; }
+  #content::-webkit-scrollbar-thumb { background: #CCC; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">handl<span>.io</span></div>
+    <div class="company">Apex Distribution Inc.</div>
+    <div class="date" id="live-date">Wednesday, April 8, 2026 · 9:14 AM</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Internal</div>
+    <div class="nav-item active" onclick="showView('mission')">
+      <span class="icon">⌂</span> Mission Control
+    </div>
+    <div class="nav-item" onclick="showView('revenue')">
+      <span class="icon">📈</span> Revenue &amp; Sales
+    </div>
+    <div class="nav-item" onclick="showView('customers')">
+      <span class="icon">🤝</span> Customer Health
+      <span class="nav-badge amber">3</span>
+    </div>
+    <div class="nav-item" onclick="showView('operations')">
+      <span class="icon">⚙️</span> Operations &amp; Team
+    </div>
+    <div class="nav-item" onclick="showView('alerts')">
+      <span class="icon">🔔</span> Alerts
+      <span class="nav-badge">5</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">External</div>
+    <div class="nav-item" onclick="showView('market')">
+      <span class="icon">🌐</span> Market Intelligence
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user"><strong>CEO View</strong> Fully managed · handl.io</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+<div id="main">
+  <div class="topbar">
+    <div>
+      <span class="topbar-title" id="view-title">Mission Control</span>
+      <span class="topbar-subtitle" id="view-sub">Your business at a glance · Monday Morning Briefing</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge-live">● LIVE</span>
+      <button class="refresh-btn">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ══════════════ MISSION CONTROL ══════════════ -->
+    <div id="view-mission">
+      <!-- KPI Row -->
+      <div class="grid grid-4" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">Weekly Revenue</div>
+          <div class="kpi-val">$847K</div>
+          <div class="kpi-label">vs $810K last week</div>
+          <div class="kpi-delta up">▲ 4.6%</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Open Pipeline</div>
+          <div class="kpi-val">$3.2M</div>
+          <div class="kpi-label">18 active quotes</div>
+          <div class="kpi-delta warn">▼ 2 quotes stale &gt;14d</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Customer Health</div>
+          <div class="kpi-val">74<span style="font-size:16px;color:var(--gray)">/100</span></div>
+          <div class="kpi-label">Across 42 active accounts</div>
+          <div class="kpi-delta down">▼ 3 at-risk accounts</div>
+        </div>
+        <div class="card">
+          <div class="card-title">AR Overdue</div>
+          <div class="kpi-val">$184K</div>
+          <div class="kpi-label">8 invoices &gt;30 days</div>
+          <div class="kpi-delta down">▲ $22K vs prior week</div>
+        </div>
+      </div>
+
+      <!-- Alerts + Daily Briefing -->
+      <div class="grid grid-2" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title gold">⚡ Active Alerts — Requires Your Attention</div>
+          <div class="alert-item">
+            <div class="alert-dot red"></div>
+            <div>
+              <div class="alert-text"><strong>Rideau Supply Co.</strong> — payment 47 days overdue. $38,400 outstanding. No response to 2 follow-ups.</div>
+              <div class="alert-time">Flagged 2 hours ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot red"></div>
+            <div>
+              <div class="alert-text"><strong>Marcus T.</strong> — quote win rate dropped to 28% this month (team avg 54%). 3 large quotes expiring this week with no follow-up logged.</div>
+              <div class="alert-time">Flagged this morning</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot amber"></div>
+            <div>
+              <div class="alert-text"><strong>Tremblay Industrial</strong> — order frequency down 60% vs 90-day avg. Last order: 34 days ago. Historically orders every 12–15 days.</div>
+              <div class="alert-time">Trend detected 3 days ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot amber"></div>
+            <div>
+              <div class="alert-text"><strong>Q2 target pace:</strong> On track for $3.1M vs $3.4M target. Gap is $300K — equivalent to 2 mid-size account wins.</div>
+              <div class="alert-time">Updated Sunday night</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot blue"></div>
+            <div>
+              <div class="alert-text"><strong>SR&amp;ED filing deadline</strong> in 18 days. Documentation for 3 eligible projects not yet compiled.</div>
+              <div class="alert-time">Compliance reminder</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title gold">☀️ Monday Morning Briefing</div>
+          <div class="briefing-item">
+            <h4>This week's single most important action</h4>
+            <p>Call Tremblay Industrial directly — their order drop is too sharp to be seasonal. Either they're trialing a competitor or there's a service issue. You need to know which before it becomes a lost account.</p>
+          </div>
+          <div class="briefing-item">
+            <h4>Revenue signal worth watching</h4>
+            <p>Two dormant accounts from Q4 — BioTech Logistics and Northland Facilities — have re-engaged on the website in the last 5 days. Both viewed pricing pages. Worth a proactive outreach this week.</p>
+          </div>
+          <div class="briefing-item">
+            <h4>Team pulse</h4>
+            <p>Overall team sentiment is stable. One signal: warehouse ops team has submitted 4 improvement suggestions in the last 10 days — unusually high. Suggests either strong engagement or underlying frustration worth a 15-minute pulse check.</p>
+          </div>
+          <div class="insight-box">
+            <p><strong>CEO Brain strategic question of the week:</strong> Marcus T.'s win rate decline started 6 weeks ago. It correlates with the territory reassignment. Is this a coaching issue, a territory fit issue, or an early attrition signal?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Weekly scorecard + priorities -->
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">Weekly Scorecard</div>
+          <div class="list-row">
+            <div class="list-label">Revenue vs. target</div>
+            <div class="list-val">$847K <span class="list-sub">/ $900K</span></div>
+            <span class="pill pill-amber">94%</span>
+          </div>
+          <div class="list-row">
+            <div class="list-label">Quotes sent</div>
+            <div class="list-val">11</div>
+            <span class="pill pill-green">On track</span>
+          </div>
+          <div class="list-row">
+            <div class="list-label">Avg time-to-quote</div>
+            <div class="list-val">4.2h</div>
+            <span class="pill pill-amber">Target: 3h</span>
+          </div>
+          <div class="list-row">
+            <div class="list-label">Customer satisfaction</div>
+            <div class="list-val">8.1/10</div>
+            <span class="pill pill-green">▲ 0.3</span>
+          </div>
+          <div class="list-row">
+            <div class="list-label">AR collected this week</div>
+            <div class="list-val">$214K</div>
+            <span class="pill pill-green">Above avg</span>
+          </div>
+          <div class="list-row">
+            <div class="list-label">PO entry backlog</div>
+            <div class="list-val">34 POs</div>
+            <span class="pill pill-red">High</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Top 3 Priorities This Week — With Blockers</div>
+          <div style="margin-top:8px;">
+            <div style="padding:10px 0; border-bottom:1px solid #F0F0F0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:13px;">1.</span>
+                <span style="font-size:12px;font-weight:700;">Close Northbrook Construction quote ($185K)</span>
+              </div>
+              <div style="font-size:11px;color:var(--gray-dark);">Quote expires Thursday. Decision-maker is VP Operations — Sarah Chen. Last touchpoint: 11 days ago.</div>
+              <div style="font-size:10px;color:var(--amber);margin-top:3px;">⚠ Blocker: No follow-up scheduled. Assign to Marcus T. today.</div>
+            </div>
+            <div style="padding:10px 0; border-bottom:1px solid #F0F0F0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:13px;">2.</span>
+                <span style="font-size:12px;font-weight:700;">Resolve Rideau Supply Co. AR situation</span>
+              </div>
+              <div style="font-size:11px;color:var(--gray-dark);">$38,400 at 47 days. Escalation needed — this has moved past accounts payable.</div>
+              <div style="font-size:10px;color:var(--red);margin-top:3px;">⛔ Blocker: Awaiting CEO-to-CEO call. Schedule today.</div>
+            </div>
+            <div style="padding:10px 0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:13px;">3.</span>
+                <span style="font-size:12px;font-weight:700;">Reduce PO entry backlog (34 open POs)</span>
+              </div>
+              <div style="font-size:11px;color:var(--gray-dark);">3-day average processing time is creating downstream fulfilment delays. Two customers have commented.</div>
+              <div style="font-size:10px;color:var(--amber);margin-top:3px;">⚠ Blocker: No automation in place yet. This is the highest-ROI AI use case in operations.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /mission -->
+
+    <!-- ══════════════ REVENUE & SALES ══════════════ -->
+    <div id="view-revenue" class="hidden">
+      <div class="grid grid-4" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">MTD Revenue</div>
+          <div class="kpi-val">$2.8M</div>
+          <div class="kpi-label">vs $3.0M target</div>
+          <div class="kpi-delta warn">93% to target</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pipeline Value</div>
+          <div class="kpi-val">$3.2M</div>
+          <div class="kpi-label">18 active opportunities</div>
+          <div class="kpi-delta up">▲ $240K vs last week</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Quote Win Rate</div>
+          <div class="kpi-val">51%</div>
+          <div class="kpi-label">Last 90 days</div>
+          <div class="kpi-delta down">▼ from 58% in Q4</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Avg Time-to-Quote</div>
+          <div class="kpi-val">4.2h</div>
+          <div class="kpi-label">Target: under 3h</div>
+          <div class="kpi-delta down">▼ opportunity to automate</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">Pipeline by Stage</div>
+          <div class="list-row">
+            <div class="list-label">Quoted — awaiting decision</div>
+            <div class="list-val">$1.4M</div>
+            <div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-gold" style="width:44%"></div></div></div>
+          </div>
+          <div class="list-row">
+            <div class="list-label">In discussion — not quoted</div>
+            <div class="list-val">$900K</div>
+            <div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-blue" style="width:28%"></div></div></div>
+          </div>
+          <div class="list-row">
+            <div class="list-label">Verbal commit — not signed</div>
+            <div class="list-val">$620K</div>
+            <div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-green" style="width:19%"></div></div></div>
+          </div>
+          <div class="list-row">
+            <div class="list-label">Stale &gt;14 days (no activity)</div>
+            <div class="list-val">$280K</div>
+            <div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-red" style="width:9%"></div></div></div>
+          </div>
+          <div class="insight-box" style="margin-top:12px;">
+            <p><strong>Revenue Risk:</strong> $280K in stale pipeline. At current win rate, recovering 50% requires active re-engagement this week. Marcus T. owns $195K of the stale total.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Sales Rep Performance — Last 30 Days</div>
+          <table class="rep-table">
+            <thead>
+              <tr>
+                <th>Rep</th><th>Quotes</th><th>Win Rate</th><th>Revenue</th><th>Trend</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sarah K.</strong></td><td>9</td><td>67%</td><td>$412K</td>
+                <td><span style="color:var(--green)">▲</span></td>
+                <td><span class="pill pill-green">Strong</span></td>
+              </tr>
+              <tr>
+                <td><strong>Daniel R.</strong></td><td>7</td><td>57%</td><td>$298K</td>
+                <td><span style="color:var(--green)">▲</span></td>
+                <td><span class="pill pill-green">On track</span></td>
+              </tr>
+              <tr>
+                <td><strong>Priya M.</strong></td><td>8</td><td>50%</td><td>$244K</td>
+                <td><span style="color:var(--amber)">→</span></td>
+                <td><span class="pill pill-amber">Watch</span></td>
+              </tr>
+              <tr>
+                <td><strong>Marcus T.</strong></td><td>11</td><td>28%</td><td>$187K</td>
+                <td><span style="color:var(--red)">▼</span></td>
+                <td><span class="pill pill-red">⚠ Flagged</span></td>
+              </tr>
+              <tr>
+                <td><strong>Lena H.</strong></td><td>5</td><td>60%</td><td>$194K</td>
+                <td><span style="color:var(--green)">▲</span></td>
+                <td><span class="pill pill-green">Strong</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="insight-box" style="margin-top:10px;">
+            <p><strong>CEO Brain Flag:</strong> Marcus T. win rate decline began 6 weeks ago — correlates with territory reassignment. Recommend 1:1 this week before Friday pipeline review.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">Revenue Trend — Last 12 Weeks</div>
+          <svg width="100%" height="80" viewBox="0 0 400 80" class="minichart">
+            <polyline points="0,60 36,55 72,52 108,58 144,48 180,42 216,45 252,40 288,38 324,44 360,36 396,30"
+              fill="none" stroke="#C5A028" stroke-width="2.5" stroke-linejoin="round"/>
+            <polyline points="0,60 36,55 72,52 108,58 144,48 180,42 216,45 252,40 288,38 324,44 360,36 396,30 396,80 0,80"
+              fill="rgba(197,160,40,0.1)" stroke="none"/>
+            <line x1="0" y1="45" x2="400" y2="45" stroke="#DDD" stroke-width="1" stroke-dasharray="4"/>
+            <text x="2" y="43" font-size="8" fill="#999">Target</text>
+          </svg>
+          <div style="font-size:10px;color:var(--gray);margin-top:4px;">Weekly revenue ($K) · 12-week trend · Target line = $900K/week</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Quote Response Time Distribution</div>
+          <div style="padding:8px 0;">
+            <div class="gauge-wrap">
+              <div class="gauge-label">Under 2 hours</div>
+              <div class="gauge-bar-wrap"><div class="progress-bar bar-green" style="height:8px;width:18%;border-radius:4px;"></div></div>
+              <div class="gauge-val" style="color:var(--green);">18%</div>
+            </div>
+            <div class="gauge-wrap" style="margin-top:6px;">
+              <div class="gauge-label">2–4 hours</div>
+              <div class="gauge-bar-wrap"><div class="progress-bar bar-gold" style="height:8px;width:35%;border-radius:4px;"></div></div>
+              <div class="gauge-val" style="color:var(--gold);">35%</div>
+            </div>
+            <div class="gauge-wrap" style="margin-top:6px;">
+              <div class="gauge-label">4–8 hours</div>
+              <div class="gauge-bar-wrap"><div class="progress-bar bar-amber" style="height:8px;width:31%;border-radius:4px;"></div></div>
+              <div class="gauge-val" style="color:var(--amber);">31%</div>
+            </div>
+            <div class="gauge-wrap" style="margin-top:6px;">
+              <div class="gauge-label">Over 8 hours</div>
+              <div class="gauge-bar-wrap"><div class="progress-bar bar-red" style="height:8px;width:16%;border-radius:4px;"></div></div>
+              <div class="gauge-val" style="color:var(--red);">16%</div>
+            </div>
+          </div>
+          <div class="insight-box">
+            <p><strong>AI Opportunity:</strong> Automating quote assembly for standard SKUs could move 60% of quotes under 1 hour. Estimated impact: +8–12 pts on win rate.</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /revenue -->
+
+    <!-- ══════════════ CUSTOMER HEALTH ══════════════ -->
+    <div id="view-customers" class="hidden">
+      <div class="grid grid-4" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">Active Accounts</div>
+          <div class="kpi-val">42</div>
+          <div class="kpi-label">12-month active</div>
+          <div class="kpi-delta up">▲ 3 new in Q1</div>
+        </div>
+        <div class="card">
+          <div class="card-title">At-Risk Accounts</div>
+          <div class="kpi-val">3</div>
+          <div class="kpi-label">Score below 50/100</div>
+          <div class="kpi-delta down">▲ 1 vs last month</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Avg Health Score</div>
+          <div class="kpi-val">74</div>
+          <div class="kpi-label">Across all active</div>
+          <div class="kpi-delta warn">▼ 2 pts vs Q4</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Revenue Concentration</div>
+          <div class="kpi-val">38%</div>
+          <div class="kpi-label">Top 5 accounts</div>
+          <div class="kpi-delta warn">⚠ High concentration</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">Account Health Monitor — All Active Accounts</div>
+        <table class="rep-table">
+          <thead>
+            <tr><th>Account</th><th>Health Score</th><th>Last Order</th><th>Order Freq.</th><th>AR Status</th><th>NPS Signal</th><th>Flag</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Blackwood Mfg</strong></td><td><span style="color:var(--green);font-weight:700;">92</span></td><td>2 days ago</td><td>Weekly</td><td><span class="pill pill-green">Current</span></td><td>😊 Positive</td><td>—</td></tr>
+            <tr><td><strong>Northbrook Const.</strong></td><td><span style="color:var(--green);font-weight:700;">88</span></td><td>5 days ago</td><td>Bi-weekly</td><td><span class="pill pill-green">Current</span></td><td>😊 Positive</td><td>—</td></tr>
+            <tr><td><strong>Carleton Logistics</strong></td><td><span style="color:var(--green);font-weight:700;">84</span></td><td>4 days ago</td><td>Weekly</td><td><span class="pill pill-green">Current</span></td><td>😐 Neutral</td><td>—</td></tr>
+            <tr><td><strong>Tremblay Industrial</strong></td><td><span style="color:var(--amber);font-weight:700;">51</span></td><td>34 days ago</td><td>↓ Dropped</td><td><span class="pill pill-green">Current</span></td><td>😐 Neutral</td><td><span class="pill pill-amber">⚠ Watch</span></td></tr>
+            <tr><td><strong>Rideau Supply Co.</strong></td><td><span style="color:var(--red);font-weight:700;">38</span></td><td>18 days ago</td><td>Slowing</td><td><span class="pill pill-red">47d Overdue</span></td><td>😞 Negative</td><td><span class="pill pill-red">🔴 At Risk</span></td></tr>
+            <tr><td><strong>Summit Fabrication</strong></td><td><span style="color:var(--red);font-weight:700;">41</span></td><td>28 days ago</td><td>↓ Dropped</td><td><span class="pill pill-amber">15d Overdue</span></td><td>😐 Neutral</td><td><span class="pill pill-red">🔴 At Risk</span></td></tr>
+            <tr><td><strong>Atlas Industrial</strong></td><td><span style="color:var(--gold);font-weight:700;">67</span></td><td>9 days ago</td><td>Monthly</td><td><span class="pill pill-green">Current</span></td><td>😊 Positive</td><td>—</td></tr>
+            <tr><td><strong>BioTech Logistics</strong></td><td><span style="color:var(--blue);font-weight:700;">N/A</span></td><td>Q4 2025</td><td>Dormant</td><td><span class="pill pill-green">Cleared</span></td><td>—</td><td><span class="pill pill-blue">🔵 Re-engaged</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">Revenue Concentration Risk</div>
+          <div class="list-row"><div class="list-label">Blackwood Mfg</div><div class="list-val">$412K/mo</div><div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-gold" style="width:82%"></div></div></div></div>
+          <div class="list-row"><div class="list-label">Northbrook Const.</div><div class="list-val">$298K/mo</div><div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-gold" style="width:60%"></div></div></div></div>
+          <div class="list-row"><div class="list-label">Carleton Logistics</div><div class="list-val">$187K/mo</div><div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-gold" style="width:37%"></div></div></div></div>
+          <div class="list-row"><div class="list-label">Atlas Industrial</div><div class="list-val">$144K/mo</div><div style="flex:1;margin-left:10px;"><div class="progress-wrap"><div class="progress-bar bar-gold" style="width:29%"></div></div></div></div>
+          <div class="insight-box" style="margin-top:10px;">
+            <p><strong>Risk flag:</strong> Top 2 accounts = 29% of total revenue. Loss of either requires 4–6 new accounts to offset. Retention priority: Blackwood, Northbrook.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title gold">🔵 Re-Engagement Signals</div>
+          <div class="alert-item">
+            <div class="alert-dot blue"></div>
+            <div>
+              <div class="alert-text"><strong>BioTech Logistics</strong> — visited pricing page twice in last 5 days. Last purchased Q4 2025. Revenue potential: $90–130K/yr.</div>
+              <div class="alert-time">Last activity: Yesterday 3:40 PM</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot blue"></div>
+            <div>
+              <div class="alert-text"><strong>Northland Facilities</strong> — opened 3 emails this week after 6 months of no engagement. Worth a proactive outreach.</div>
+              <div class="alert-time">Last email open: Today 8:22 AM</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px;background:var(--gold-light);border-radius:6px;">
+            <div style="font-size:10px;font-weight:700;color:#7A6010;margin-bottom:4px;">RECOMMENDED ACTION</div>
+            <div style="font-size:11px;color:#5A4010;">Assign re-engagement outreach to Sarah K. for both accounts today. Suggested framing: check-in on Q2 needs, reference new product availability. Do not wait for inbound.</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /customers -->
+
+    <!-- ══════════════ OPERATIONS & TEAM ══════════════ -->
+    <div id="view-operations" class="hidden">
+      <div class="grid grid-4" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">PO Backlog</div>
+          <div class="kpi-val">34</div>
+          <div class="kpi-label">Open purchase orders</div>
+          <div class="kpi-delta down">Avg processing: 3.1 days</div>
+        </div>
+        <div class="card">
+          <div class="card-title">CSR Emails Pending</div>
+          <div class="kpi-val">47</div>
+          <div class="kpi-label">Unresolved inbound</div>
+          <div class="kpi-delta warn">Avg response: 6.8h</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Team Sentiment</div>
+          <div class="kpi-val">7.4<span style="font-size:16px;color:var(--gray)">/10</span></div>
+          <div class="kpi-label">Weekly pulse avg</div>
+          <div class="kpi-delta up">▲ 0.4 vs last week</div>
+        </div>
+        <div class="card">
+          <div class="card-title">On-Time Delivery</div>
+          <div class="kpi-val">91%</div>
+          <div class="kpi-label">Last 30 days</div>
+          <div class="kpi-delta warn">Target: 95%</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">Internal Sentiment Radar</div>
+          <div style="margin-top:4px;">
+            <div class="gauge-wrap"><div class="gauge-label">Sales team</div><div class="gauge-bar-wrap"><div class="progress-bar bar-green" style="height:8px;width:76%;border-radius:4px;"></div></div><div class="gauge-val" style="color:var(--green);">7.6</div></div>
+            <div class="gauge-wrap" style="margin-top:8px;"><div class="gauge-label">Operations / Warehouse</div><div class="gauge-bar-wrap"><div class="progress-bar bar-amber" style="height:8px;width:68%;border-radius:4px;"></div></div><div class="gauge-val" style="color:var(--amber);">6.8</div></div>
+            <div class="gauge-wrap" style="margin-top:8px;"><div class="gauge-label">Customer service</div><div class="gauge-bar-wrap"><div class="progress-bar bar-amber" style="height:8px;width:65%;border-radius:4px;"></div></div><div class="gauge-val" style="color:var(--amber);">6.5</div></div>
+            <div class="gauge-wrap" style="margin-top:8px;"><div class="gauge-label">Finance / Admin</div><div class="gauge-bar-wrap"><div class="progress-bar bar-green" style="height:8px;width:80%;border-radius:4px;"></div></div><div class="gauge-val" style="color:var(--green);">8.0</div></div>
+          </div>
+          <div class="insight-box" style="margin-top:12px;">
+            <p><strong>Signal:</strong> Operations team submitted 4 process improvement suggestions this week. Above average. Could indicate high engagement — or simmering frustration with inefficiencies. Recommend brief check-in with ops lead.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Operational Bottlenecks — AI Opportunity Map</div>
+          <div class="list-row">
+            <div style="flex:1;">
+              <div class="list-label"><strong>PO Entry</strong></div>
+              <div class="list-sub">34 open · 3.1 day avg · 2.5 FTE hours/day</div>
+            </div>
+            <span class="pill pill-red">High Priority</span>
+          </div>
+          <div class="list-row">
+            <div style="flex:1;">
+              <div class="list-label"><strong>CSR Email Triage</strong></div>
+              <div class="list-sub">47 pending · 6.8h avg response · 3 FTE hours/day</div>
+            </div>
+            <span class="pill pill-red">High Priority</span>
+          </div>
+          <div class="list-row">
+            <div style="flex:1;">
+              <div class="list-label"><strong>Quote Assembly</strong></div>
+              <div class="list-sub">4.2h avg · 60% standard SKUs</div>
+            </div>
+            <span class="pill pill-amber">Medium</span>
+          </div>
+          <div class="list-row">
+            <div style="flex:1;">
+              <div class="list-label"><strong>AR Follow-up</strong></div>
+              <div class="list-sub">8 overdue · manual outreach process</div>
+            </div>
+            <span class="pill pill-amber">Medium</span>
+          </div>
+          <div class="list-row">
+            <div style="flex:1;">
+              <div class="list-label"><strong>Weekly Reporting</strong></div>
+              <div class="list-sub">Est. 6 hrs/week across team</div>
+            </div>
+            <span class="pill pill-blue">Automate</span>
+          </div>
+          <div class="insight-box" style="margin-top:10px;">
+            <p><strong>Combined AI opportunity:</strong> PO entry + CSR triage automation estimated to recover 5.5 FTE hours/day. At fully loaded cost, that's ~$180K/yr in capacity — equivalent to 1.2 FTEs.</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /operations -->
+
+    <!-- ══════════════ ALERTS ══════════════ -->
+    <div id="view-alerts" class="hidden">
+      <div class="grid grid-3" style="margin-bottom:14px;">
+        <div class="card"><div class="card-title">Critical</div><div class="kpi-val" style="color:var(--red);">2</div><div class="kpi-label">Require immediate action</div></div>
+        <div class="card"><div class="card-title">Warning</div><div class="kpi-val" style="color:var(--amber);">3</div><div class="kpi-label">Monitor this week</div></div>
+        <div class="card"><div class="card-title">Informational</div><div class="kpi-val" style="color:var(--blue);">3</div><div class="kpi-label">FYI — no action required now</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title gold">All Active Alerts</div>
+        <div class="alert-item">
+          <div class="alert-dot red"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>🔴 CRITICAL — Rideau Supply Co. AR</strong> — $38,400 at 47 days overdue. Two follow-ups unanswered. CEO-level escalation required. Risk of bad debt if unresolved by end of week.</div>
+            <div class="alert-time">Revenue Risk · Flagged 2h ago</div>
+          </div>
+          <span class="pill pill-red">Act Today</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot red"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>🔴 CRITICAL — Marcus T. performance</strong> — Win rate 28% vs team avg 54%. 3 large quotes ($185K combined) expiring this week without follow-up logged. Risk of pipeline cliff.</div>
+            <div class="alert-time">Sales Risk · Flagged this morning</div>
+          </div>
+          <span class="pill pill-red">Act Today</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot amber"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>⚠ WARNING — Tremblay Industrial churn signal</strong> — Order frequency down 60% vs 90-day average. No complaint on file. Possible competitor trial underway.</div>
+            <div class="alert-time">Customer Health · 3 days ago</div>
+          </div>
+          <span class="pill pill-amber">This Week</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot amber"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>⚠ WARNING — Q2 revenue pace</strong> — Currently tracking to $3.1M vs $3.4M target. Gap is $300K — approximately 2 mid-size account wins or acceleration of 3 stale pipeline items.</div>
+            <div class="alert-time">Revenue · Updated Sunday</div>
+          </div>
+          <span class="pill pill-amber">This Week</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot amber"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>⚠ WARNING — PO entry backlog</strong> — 34 open POs at 3.1 day avg processing. Two customers have made delivery timeline inquiries this week.</div>
+            <div class="alert-time">Operations · Ongoing</div>
+          </div>
+          <span class="pill pill-amber">Monitor</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot blue"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>🔵 INFO — SR&amp;ED filing deadline in 18 days.</strong> Documentation for 3 eligible AI and process improvement projects not yet compiled. Potential recovery: $40–60K.</div>
+            <div class="alert-time">Compliance · Reminder</div>
+          </div>
+          <span class="pill pill-blue">Schedule</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot blue"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>🔵 INFO — Re-engagement signals:</strong> BioTech Logistics and Northland Facilities showing activity after dormancy. No action required — but outreach this week is timely.</div>
+            <div class="alert-time">Customer Opportunity · Today</div>
+          </div>
+          <span class="pill pill-blue">Opportunity</span>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot blue"></div>
+          <div style="flex:1;">
+            <div class="alert-text"><strong>🔵 INFO — Operations team engagement signal:</strong> 4 process improvement suggestions submitted in 7 days. Unusual volume — worth a brief check-in with ops lead.</div>
+            <div class="alert-time">Team Pulse · 2 days ago</div>
+          </div>
+          <span class="pill pill-blue">FYI</span>
+        </div>
+      </div>
+    </div><!-- /alerts -->
+
+    <!-- ══════════════ MARKET INTELLIGENCE (External) ══════════════ -->
+    <div id="view-market" class="hidden">
+      <div class="card" style="margin-bottom:14px; background:var(--gold-light); border:1px solid var(--gold);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">🌐</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#7A6010;">External Intelligence — Market & Competitive</div>
+            <div style="font-size:11px;color:#9A8030;margin-top:2px;">Synthesised from competitor activity, industry publications, and market signals. Updated daily.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="card-title">Competitor Signal Engine</div>
+          <div class="alert-item">
+            <div class="alert-dot amber"></div>
+            <div>
+              <div class="alert-text"><strong>Precision Parts Direct</strong> — posted 3 new sales roles in Ontario in the past 30 days. Signals territory expansion into your primary market.</div>
+              <div class="alert-time">LinkedIn signal · 5 days ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot blue"></div>
+            <div>
+              <div class="alert-text"><strong>Consolidated Industrial Supply</strong> — launched new online quoting portal this week. Positions as "quote in under 60 minutes." Direct response to speed-of-quote complaints in the market.</div>
+              <div class="alert-time">Press release · 2 days ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot blue"></div>
+            <div>
+              <div class="alert-text"><strong>Northern Fasteners Co.</strong> — CEO posted about their Q1 results: "record customer retention." Sentiment suggests strong service improvements underway.</div>
+              <div class="alert-time">LinkedIn post · 1 week ago</div>
+            </div>
+          </div>
+          <div class="insight-box" style="margin-top:10px;">
+            <p><strong>Synthesis:</strong> The competitive move that matters most is Consolidated's 60-minute quote portal. If this becomes the market standard, your 4.2h average becomes a liability. This is the highest-urgency competitive signal this month.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Industry &amp; Market Pulse</div>
+          <div class="briefing-item">
+            <h4>Supply chain outlook — Q2 2026</h4>
+            <p>Steel and fastener lead times stabilising after Q1 disruptions. Analysts project 8–12% cost reduction on standard SKUs by June. Worth reviewing supplier contracts now.</p>
+          </div>
+          <div class="briefing-item">
+            <h4>Regulatory update</h4>
+            <p>New Ontario procurement rules for B2B digital invoicing take effect July 1. Companies not e-invoice compliant by then may be excluded from public sector RFPs.</p>
+          </div>
+          <div class="briefing-item">
+            <h4>Tariff watch</h4>
+            <p>US-Canada trade situation remains fluid. Contingency planning recommended for any SKUs with cross-border supply dependencies over 30% of volume.</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /market -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const views = {
+  mission: { title: 'Mission Control', sub: 'Your business at a glance · Monday Morning Briefing' },
+  revenue: { title: 'Revenue & Sales', sub: 'Pipeline, rep performance & quote intelligence' },
+  customers: { title: 'Customer Health', sub: 'Account health, churn signals & re-engagement' },
+  operations: { title: 'Operations & Team', sub: 'Workflows, bottlenecks & internal sentiment' },
+  alerts: { title: 'Alerts', sub: 'All active signals requiring attention or awareness' },
+  market: { title: 'Market Intelligence', sub: 'External signals · Competitive & industry' },
+};
+
+function showView(name) {
+  // Hide all views
+  Object.keys(views).forEach(v => {
+    const el = document.getElementById('view-' + v);
+    if (el) el.classList.add('hidden');
+  });
+  // Show selected
+  const target = document.getElementById('view-' + name);
+  if (target) target.classList.remove('hidden');
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  // Update topbar
+  document.getElementById('view-title').textContent = views[name].title;
+  document.getElementById('view-sub').textContent = views[name].sub;
+}
+
+// Live date
+function updateDate() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let h = now.getHours(), m = now.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('live-date').textContent =
+    `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()} · ${h}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+updateDate();
+setInterval(updateDate, 60000);
+</script>
+</body>
+</html>
