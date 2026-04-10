@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Intelligence Dashboard — handl.io</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg:#f0f2f5; --card:#fff; --header:#0d1117;
+  --accent:#6366f1; --green:#059669; --red:#dc2626; --amber:#d97706;
+  --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+  --radius:10px; --gap:16px; --shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+
+/* HEADER */
+.header{background:var(--header);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.logo{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.logo span{color:var(--accent);}
+.dash-title{font-size:13px;color:rgba(255,255,255,0.45);border-left:1px solid rgba(255,255,255,0.12);padding-left:14px;}
+.header-right{display:flex;align-items:center;gap:14px;}
+.as-of{font-size:11px;color:rgba(255,255,255,0.45);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:pulse 2s infinite;display:inline-block;margin-right:5px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* LAYOUT */
+.main{padding:20px 28px;max-width:1500px;margin:0 auto;}
+.section-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;}
+
+/* KPI GRID */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap);margin-bottom:var(--gap);}
+.kpi-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-top:3px solid var(--border);}
+.kpi-card.cash    {border-top-color:#6366f1;}
+.kpi-card.ar      {border-top-color:#10b981;}
+.kpi-card.ap      {border-top-color:#f59e0b;}
+.kpi-card.po      {border-top-color:#3b82f6;}
+.kpi-card.dso     {border-top-color:#8b5cf6;}
+.kpi-card.runway  {border-top-color:#ec4899;}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.kpi-value{font-size:24px;font-weight:700;margin-bottom:4px;line-height:1.1;}
+.kpi-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.up{color:var(--green);font-weight:600;}
+.dn{color:var(--red);font-weight:600;}
+.nt{color:var(--amber);font-weight:600;}
+
+/* MID ROW */
+.mid-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:var(--gap);margin-bottom:var(--gap);}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.chart-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.chart-card .sub{font-size:11px;color:var(--muted);margin-bottom:14px;}
+.chart-card canvas{height:210px!important;}
+
+/* PAYMENT DIRECTION CARD */
+.direction-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.direction-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.direction-card .sub{font-size:11px;color:var(--muted);margin-bottom:16px;}
+.dir-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.dir-row:last-child{border-bottom:none;}
+.dir-label{font-size:12px;color:var(--muted);}
+.dir-val{font-size:15px;font-weight:700;}
+.dir-val.in{color:var(--green);}
+.dir-val.out{color:var(--red);}
+.dir-val.net-pos{color:var(--green);}
+.dir-val.net-neg{color:var(--red);}
+.dir-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.net-bar{height:6px;border-radius:3px;background:#f3f4f6;margin-top:14px;overflow:hidden;}
+.net-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),#10b981);}
+
+/* BOTTOM ROW */
+.bottom-row{display:grid;grid-template-columns:1.2fr 1fr;gap:var(--gap);margin-bottom:var(--gap);}
+.table-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);overflow-x:auto;}
+.table-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.table-card .sub{font-size:11px;color:var(--muted);margin-bottom:14px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;cursor:pointer;white-space:nowrap;user-select:none;}
+thead th:hover{color:var(--text);}
+tbody td{padding:9px 10px;border-bottom:1px solid #f3f4f6;white-space:nowrap;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#fafafa;}
+
+/* STATUS PILLS */
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.pill-green{background:#ecfdf5;color:#065f46;}
+.pill-red{background:#fef2f2;color:#991b1b;}
+.pill-amber{background:#fffbeb;color:#92400e;}
+.pill-blue{background:#eff6ff;color:#1d4ed8;}
+
+/* ALERTS */
+.alerts-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.alerts-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.alerts-card .sub{font-size:11px;color:var(--muted);margin-bottom:14px;}
+.alert-item{display:flex;gap:10px;padding:10px 12px;border-radius:7px;margin-bottom:8px;}
+.alert-item:last-child{margin-bottom:0;}
+.alert-item.warn{background:#fffbeb;border-left:3px solid var(--amber);}
+.alert-item.danger{background:#fef2f2;border-left:3px solid var(--red);}
+.alert-item.good{background:#ecfdf5;border-left:3px solid var(--green);}
+.alert-item.info{background:#eff6ff;border-left:3px solid #3b82f6;}
+.alert-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.alert-content{}
+.alert-title{font-size:12px;font-weight:600;margin-bottom:2px;}
+.alert-detail{font-size:11px;color:var(--muted);line-height:1.5;}
+
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:14px 0 28px;}
+
+@media(max-width:1100px){
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .mid-row{grid-template-columns:1fr 1fr;}
+  .bottom-row{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .main{padding:14px 16px;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .mid-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="logo">handl<span>.</span>io</div>
+    <div class="dash-title">Financial Intelligence Dashboard</div>
+  </div>
+  <div class="header-right">
+    <span class="as-of"><span class="live-dot"></span>As of April 9, 2026 · Q2 FY2026</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- KPIs -->
+  <div class="section-title">Key Financial Indicators</div>
+  <div class="kpi-row">
+    <div class="kpi-card cash">
+      <div class="kpi-label">Cash Balance</div>
+      <div class="kpi-value">$842K</div>
+      <div class="kpi-sub"><span class="up">+$64K</span> vs last month</div>
+    </div>
+    <div class="kpi-card ar">
+      <div class="kpi-label">AR Outstanding</div>
+      <div class="kpi-value">$318K</div>
+      <div class="kpi-sub"><span class="nt">3 invoices</span> overdue &gt;30d</div>
+    </div>
+    <div class="kpi-card ap">
+      <div class="kpi-label">AP Outstanding</div>
+      <div class="kpi-value">$142K</div>
+      <div class="kpi-sub"><span class="dn">$38K</span> due this week</div>
+    </div>
+    <div class="kpi-card po">
+      <div class="kpi-label">Open POs</div>
+      <div class="kpi-value">$226K</div>
+      <div class="kpi-sub"><span class="nt">11 POs</span> pending receipt</div>
+    </div>
+    <div class="kpi-card dso">
+      <div class="kpi-label">Days Sales Out.</div>
+      <div class="kpi-value">38d</div>
+      <div class="kpi-sub"><span class="nt">+4d</span> vs prior quarter</div>
+    </div>
+    <div class="kpi-card runway">
+      <div class="kpi-label">Cash Runway</div>
+      <div class="kpi-value">14 mo</div>
+      <div class="kpi-sub"><span class="up">+2 mo</span> vs last quarter</div>
+    </div>
+  </div>
+
+  <!-- MID ROW -->
+  <div class="mid-row">
+
+    <!-- CASH FLOW TREND -->
+    <div class="chart-card">
+      <h3>Cash Flow — Last 6 Months</h3>
+      <div class="sub">Inflows vs outflows · monthly</div>
+      <canvas id="cashflow-chart"></canvas>
+    </div>
+
+    <!-- NET PAYMENT FLOW -->
+    <div class="direction-card">
+      <h3>Avg Net Payment Flow</h3>
+      <div class="sub">Monthly averages · trailing 90 days</div>
+      <div class="dir-row">
+        <div>
+          <div class="dir-label">Avg Monthly In</div>
+          <div class="dir-sub">Customer receipts + other</div>
+        </div>
+        <div class="dir-val in">+$284K</div>
+      </div>
+      <div class="dir-row">
+        <div>
+          <div class="dir-label">Avg Monthly Out</div>
+          <div class="dir-sub">Payroll, vendors, ops</div>
+        </div>
+        <div class="dir-val out">−$218K</div>
+      </div>
+      <div class="dir-row">
+        <div>
+          <div class="dir-label">Avg Net</div>
+          <div class="dir-sub">Monthly surplus</div>
+        </div>
+        <div class="dir-val net-pos">+$66K</div>
+      </div>
+      <div class="net-bar"><div class="net-fill" style="width:77%"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:5px;text-align:right;">Inflow utilisation 77%</div>
+    </div>
+
+    <!-- AR AGING DONUT -->
+    <div class="chart-card">
+      <h3>AR Aging</h3>
+      <div class="sub">By days outstanding</div>
+      <canvas id="aging-chart"></canvas>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+
+    <!-- OPEN PO TABLE -->
+    <div class="table-card">
+      <h3>Open Purchase Orders</h3>
+      <div class="sub">11 POs · $226K total committed</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>PO #</th>
+            <th>Amount</th>
+            <th>Issued</th>
+            <th>Expected</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="po-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="alerts-card">
+      <h3>⚡ Finance Alerts</h3>
+      <div class="sub">Items needing attention</div>
+      <div class="alert-item danger">
+        <div class="alert-icon">🔴</div>
+        <div class="alert-content">
+          <div class="alert-title">Overdue AR — Acme Corp ($48K)</div>
+          <div class="alert-detail">Invoice INV-2024-031 is 47 days past due. Follow-up email sent Mar 25. Escalation recommended.</div>
+        </div>
+      </div>
+      <div class="alert-item danger">
+        <div class="alert-icon">🔴</div>
+        <div class="alert-content">
+          <div class="alert-title">AP Due This Week — $38K</div>
+          <div class="alert-detail">3 vendor payments due Apr 10–12. Cloudflare ($4.2K), Salesforce ($18K), Contractor batch ($15.8K).</div>
+        </div>
+      </div>
+      <div class="alert-item warn">
+        <div class="alert-icon">🟡</div>
+        <div class="alert-content">
+          <div class="alert-title">DSO Trending Up (+4 days QoQ)</div>
+          <div class="alert-detail">Average collection time extended to 38 days. Two clients on net-60 terms driving variance. Review terms.</div>
+        </div>
+      </div>
+      <div class="alert-item warn">
+        <div class="alert-icon">🟡</div>
+        <div class="alert-content">
+          <div class="alert-title">PO Backlog Growing — $226K Open</div>
+          <div class="alert-detail">11 open POs vs. 7 same period last quarter. 4 POs past expected receipt date. Chase delivery confirmations.</div>
+        </div>
+      </div>
+      <div class="alert-item good">
+        <div class="alert-icon">🟢</div>
+        <div class="alert-content">
+          <div class="alert-title">Cash Runway Extended to 14 Months</div>
+          <div class="alert-detail">Up from 12 months last quarter. Net positive cash flow of +$66K/month maintained for 3 consecutive months.</div>
+        </div>
+      </div>
+      <div class="alert-item info">
+        <div class="alert-icon">🔵</div>
+        <div class="alert-content">
+          <div class="alert-title">Q2 Budget Review Due Apr 15</div>
+          <div class="alert-detail">YTD spend tracking 94% of Q2 budget. 3 departments above plan: Sales +12%, Eng +8%, Marketing +6%.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer"><strong>handl.io Financial Intelligence</strong> · Sample data for demonstration · Connects to QuickBooks, Xero, NetSuite, and ERP systems via handl.io</div>
+
+<script>
+// ── CASH FLOW CHART ──────────────────────────────────────────────────────────
+const cfCtx = document.getElementById('cashflow-chart').getContext('2d');
+new Chart(cfCtx, {
+  type:'bar',
+  data:{
+    labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+    datasets:[
+      { label:'Inflows',  data:[248,265,310,275,290,284], backgroundColor:'rgba(16,185,129,0.7)',  borderColor:'#059669', borderWidth:1, borderRadius:4, order:2 },
+      { label:'Outflows', data:[220,238,285,245,224,218], backgroundColor:'rgba(239,68,68,0.65)',  borderColor:'#dc2626', borderWidth:1, borderRadius:4, order:3 },
+      { label:'Net',      data:[28,27,25,30,66,66],       type:'line', borderColor:'#6366f1', backgroundColor:'rgba(99,102,241,0.1)', borderWidth:2, tension:0.4, fill:false, pointRadius:4, yAxisID:'y2', order:1 }
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,animation:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:14,font:{size:11}}}},
+    scales:{
+      x:{grid:{display:false}},
+      y:{beginAtZero:true,position:'left',ticks:{callback:v=>'$'+v+'K',font:{size:10}},grid:{color:'#f3f4f6'}},
+      y2:{beginAtZero:true,position:'right',ticks:{callback:v=>'$'+v+'K',font:{size:10}},grid:{display:false}}
+    }
+  }
+});
+
+// ── AR AGING DONUT ───────────────────────────────────────────────────────────
+const agCtx = document.getElementById('aging-chart').getContext('2d');
+new Chart(agCtx, {
+  type:'doughnut',
+  data:{
+    labels:['0–30 days','31–60 days','61–90 days','90+ days'],
+    datasets:[{
+      data:[186,64,48,20],
+      backgroundColor:['rgba(16,185,129,0.8)','rgba(245,158,11,0.8)','rgba(239,68,68,0.7)','rgba(127,29,29,0.8)'],
+      borderColor:'#ffffff',borderWidth:2
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,animation:false,cutout:'62%',
+    plugins:{
+      legend:{position:'bottom',labels:{usePointStyle:true,padding:10,font:{size:11}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: $${ctx.parsed}K`}}
+    }
+  }
+});
+
+// ── PO TABLE ─────────────────────────────────────────────────────────────────
+const POS = [
+  { vendor:'AWS',           po:'PO-1142', amount:'$18,400', issued:'Mar 01', expected:'Apr 15', status:'open'      },
+  { vendor:'Salesforce',    po:'PO-1138', amount:'$32,000', issued:'Feb 15', expected:'Apr 01', status:'overdue'   },
+  { vendor:'HubSpot',       po:'PO-1145', amount:'$12,800', issued:'Mar 10', expected:'Apr 10', status:'open'      },
+  { vendor:'Notion',        po:'PO-1148', amount:'$4,200',  issued:'Mar 18', expected:'Apr 18', status:'open'      },
+  { vendor:'Design Studio', po:'PO-1133', amount:'$28,500', issued:'Feb 01', expected:'Mar 15', status:'overdue'   },
+  { vendor:'Legal — Osler', po:'PO-1151', amount:'$45,000', issued:'Mar 22', expected:'Apr 30', status:'open'      },
+  { vendor:'DataDog',       po:'PO-1140', amount:'$9,600',  issued:'Feb 28', expected:'Mar 28', status:'overdue'   },
+  { vendor:'Contractor — D',po:'PO-1154', amount:'$22,400', issued:'Apr 01', expected:'Apr 22', status:'open'      },
+  { vendor:'Stripe',        po:'PO-1156', amount:'$8,100',  issued:'Apr 03', expected:'Apr 20', status:'open'      },
+  { vendor:'Office — WeWork',po:'PO-1130',amount:'$38,400', issued:'Jan 15', expected:'Jan 15', status:'received'  },
+  { vendor:'IT Hardware',   po:'PO-1158', amount:'$7,100',  issued:'Apr 05', expected:'Apr 25', status:'open'      },
+];
+const statusPill = s => ({
+  open:     '<span class="pill pill-blue">Open</span>',
+  overdue:  '<span class="pill pill-red">Overdue</span>',
+  received: '<span class="pill pill-green">Received</span>',
+}[s]||s);
+document.getElementById('po-tbody').innerHTML = POS.map(p=>`
+  <tr>
+    <td style="font-weight:500">${p.vendor}</td>
+    <td style="color:var(--muted)">${p.po}</td>
+    <td style="font-weight:600">${p.amount}</td>
+    <td style="color:var(--muted)">${p.issued}</td>
+    <td>${p.expected}</td>
+    <td>${statusPill(p.status)}</td>
+  </tr>`).join('');
+</script>
+</body>
+</html>
